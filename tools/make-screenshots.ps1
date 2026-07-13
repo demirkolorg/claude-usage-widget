@@ -136,10 +136,57 @@ function New-PillVisual {
     return $pill
 }
 
+# Wide promo card (for social/Reddit posts and the repo social preview)
+function New-PromoVisual([string]$lang) {
+    $grid = New-Object System.Windows.Controls.Grid
+    $colLeft = New-Object System.Windows.Controls.ColumnDefinition
+    $colLeft.Width = New-Object System.Windows.GridLength(1, [System.Windows.GridUnitType]::Star)
+    $colRight = New-Object System.Windows.Controls.ColumnDefinition
+    $colRight.Width = [System.Windows.GridLength]::Auto
+    [void]$grid.ColumnDefinitions.Add($colLeft)
+    [void]$grid.ColumnDefinitions.Add($colRight)
+
+    $left = New-Object System.Windows.Controls.StackPanel
+    $left.VerticalAlignment = [System.Windows.VerticalAlignment]::Center
+    $left.Margin = New-Object System.Windows.Thickness(0, 0, 36, 0)
+
+    $title = New-Text 'Claude Usage Widget' 30 $script:Colors.TextPrimary 'SemiBold'
+    if ($lang -eq 'tr') {
+        $subText = "Claude Code oturum ve haftalık limitleriniz" + [Environment]::NewLine + "her zaman görev çubuğunuzda"
+        $bullets = @("Saf PowerShell + WPF — sıfır bağımlılık", "Tek satırla kurulum", "Veri yalnızca Anthropic API'sinden", "Açık kaynak · MIT")
+    } else {
+        $subText = 'Your Claude Code session & weekly limits' + [Environment]::NewLine + 'always visible in your Windows taskbar'
+        $bullets = @('Pure PowerShell + WPF - zero dependencies', 'One-liner install', 'Talks only to the Anthropic API', 'Open source - MIT')
+    }
+    $sub = New-Text $subText 14.5 $script:Colors.TextSecondary 'Normal'
+    $sub.Margin = New-Object System.Windows.Thickness(0, 8, 0, 22)
+
+    [void]$left.Children.Add($title)
+    [void]$left.Children.Add($sub)
+    [void]$left.Children.Add((New-PillVisual))
+    $spacer = New-Object System.Windows.Controls.Border
+    $spacer.Height = 22
+    [void]$left.Children.Add($spacer)
+    foreach ($b in $bullets) {
+        $line = New-Text ("$([char]0x2713)  $b") 13 '#B9BEC7' 'Normal'
+        $line.Margin = New-Object System.Windows.Thickness(0, 0, 0, 7)
+        [void]$left.Children.Add($line)
+    }
+
+    $panel = New-PanelVisual
+    $panel.Width = 440
+    [System.Windows.Controls.Grid]::SetColumn($panel, 1)
+
+    [void]$grid.Children.Add($left)
+    [void]$grid.Children.Add($panel)
+    return $grid
+}
+
 foreach ($lang in @('en', 'tr')) {
     Set-UsageLanguage $lang
     Save-Png (New-Backdrop (New-PanelVisual)) (Join-Path $assets "panel-$lang.png") (440 + 56)
     Save-Png (New-Backdrop (New-WidgetVisual) 24) (Join-Path $assets "widget-$lang.png") (330 + 48)
     Save-Png (New-Backdrop (New-PillVisual) 16) (Join-Path $assets "pill-$lang.png") 240
+    Save-Png (New-Backdrop (New-PromoVisual $lang) 44) (Join-Path $assets "promo-$lang.png") 980
 }
 Write-Host 'All screenshots generated.'

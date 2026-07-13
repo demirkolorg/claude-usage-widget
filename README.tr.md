@@ -6,7 +6,7 @@
 
 Görev çubuğunuzun sol köşesine yaslanan küçük bir rozet canlı özet gösterir. Tıkladığınızda tüm limitleri içeren bir panel açılır: kullanılan %, kalan % ve sıfırlanma zamanları — *claude.ai → Settings → Usage* sayfasındaki verinin birebir aynısı.
 
-![Panel](assets/panel-tr.png)
+![Claude Usage Widget](assets/promo-tr.png)
 
 | Taskbar rozeti (hep görünür) | Kart widget (isteğe bağlı) |
 | --- | --- |

@@ -6,7 +6,7 @@ Lightweight Windows indicators for your **Claude Code** session and weekly usage
 
 A small pill docked at the left edge of your taskbar shows a live summary. Click it and a panel flies out with every limit: used %, remaining %, and reset times — the exact same data as *claude.ai → Settings → Usage*.
 
-![Panel](assets/panel-en.png)
+![Claude Usage Widget](assets/promo-en.png)
 
 | Taskbar pill (always visible) | Floating card (optional) |
 | --- | --- |
