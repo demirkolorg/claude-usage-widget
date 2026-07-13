@@ -101,7 +101,10 @@ function Update-Usage([switch]$Force) {
         $msg = $_.Exception.Message
         if ($msg -match '429') {
             $msg = $script:L.Err429
-            $script:BackoffUntil = [DateTime]::Now.AddMinutes(5)
+            # Elimizde hic veri yoksa kisa araliklarla dene, veri varsa uzun bekle
+            $mins = 5
+            if ($script:RowsPanel.Children.Count -eq 0) { $mins = 1 }
+            $script:BackoffUntil = [DateTime]::Now.AddMinutes($mins)
         }
         $script:StatusText.Text = "$($script:L.ErrorLbl): $msg"
         $script:StatusText.Foreground = Get-Brush $script:Colors.FillCritical

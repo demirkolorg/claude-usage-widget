@@ -157,7 +157,10 @@ function Update-All([switch]$Force) {
         $msg = $_.Exception.Message
         if ($msg -match '429') {
             $msg = $script:L.Err429
-            $script:BackoffUntil = [DateTime]::Now.AddMinutes(5)
+            # Elimizde hic veri yoksa kisa araliklarla dene, veri varsa uzun bekle
+            $mins = 5
+            if (-not $script:HasData) { $mins = 1 }
+            $script:BackoffUntil = [DateTime]::Now.AddMinutes($mins)
         }
         # On transient errors keep the last good pill data; only surface in the status line
         if (-not $script:HasData) {
