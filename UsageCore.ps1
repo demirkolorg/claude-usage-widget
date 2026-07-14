@@ -39,6 +39,8 @@ $script:Strings = @{
         LeftFmt        = "%{0} kaldı"
         ResetSessionH  = "Sıfırlanma: {0} sa {1} dk"
         ResetSessionM  = "Sıfırlanma: {0} dk"
+        ResetShortH    = "{0} sa {1} dk"
+        ResetShortM    = "{0} dk"
         ResetWeekly    = "Sıfırlanma: {0} {1}"
         Updated        = "Güncellendi"
         ErrorLbl       = 'Hata'
@@ -67,6 +69,8 @@ $script:Strings = @{
         LeftFmt        = '{0}% left'
         ResetSessionH  = 'Resets in {0}h {1}m'
         ResetSessionM  = 'Resets in {0}m'
+        ResetShortH    = '{0}h {1}m'
+        ResetShortM    = '{0}m'
         ResetWeekly    = 'Resets {0} {1}'
         Updated        = 'Updated'
         ErrorLbl       = 'Error'
@@ -212,6 +216,19 @@ function Format-ResetText([string]$resetsAt, [string]$group) {
 
     $day = $script:L.Days["$($local.DayOfWeek)"]
     return $script:L.ResetWeekly -f $day, $local.ToString('HH:mm')
+}
+
+# Rozet gibi dar alanlar icin kompakt geri sayim: "1 sa 12 dk" / "1h 12m"
+function Format-ResetShort([string]$resetsAt) {
+    if (-not $resetsAt) { return '' }
+    try {
+        $local = [DateTimeOffset]::Parse($resetsAt).ToLocalTime()
+    } catch { return '' }
+    $ts = $local - [DateTimeOffset]::Now
+    if ($ts.TotalSeconds -lt 0) { $ts = [TimeSpan]::Zero }
+    $h = [math]::Floor($ts.TotalHours)
+    if ($h -ge 1) { return $script:L.ResetShortH -f $h, $ts.Minutes }
+    return $script:L.ResetShortM -f $ts.Minutes
 }
 
 function Get-FillColor([double]$percent, [string]$severity) {

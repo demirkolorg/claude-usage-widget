@@ -34,6 +34,7 @@ $pillXaml = @'
     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
       <TextBlock Text="&#x2733;" Foreground="#DA7756" FontSize="12" Margin="0,0,7,0" VerticalAlignment="Center"/>
       <TextBlock x:Name="SessionTxt" Text="&#8230;" FontSize="12" Foreground="#F2F3F5" VerticalAlignment="Center"/>
+      <TextBlock x:Name="SessionResetTxt" FontSize="12" Foreground="#8A8F98" VerticalAlignment="Center"/>
       <TextBlock Text=" &#183; " FontSize="12" Foreground="#6B7078" VerticalAlignment="Center"/>
       <TextBlock x:Name="WeeklyTxt" Text="&#8230;" FontSize="12" Foreground="#F2F3F5" VerticalAlignment="Center"/>
     </StackPanel>
@@ -77,6 +78,7 @@ $panelXaml = @'
 $script:PillWin  = [Windows.Markup.XamlReader]::Parse($pillXaml)
 $script:Panel    = [Windows.Markup.XamlReader]::Parse($panelXaml)
 $script:SessionTxt = $script:PillWin.FindName('SessionTxt')
+$script:SessionResetTxt = $script:PillWin.FindName('SessionResetTxt')
 $script:WeeklyTxt  = $script:PillWin.FindName('WeeklyTxt')
 $script:PillBorder = $script:PillWin.FindName('Pill')
 $script:RowsPanel  = $script:Panel.FindName('Rows')
@@ -134,8 +136,11 @@ function Update-All([switch]$Force) {
         if ($session) {
             $script:SessionTxt.Text = "$($script:L.PillSession) $(Format-Pct ([math]::Round($session.Percent)))"
             $script:SessionTxt.Foreground = Get-Brush (Get-FillColor $session.Percent $session.Severity)
+            $rs = Format-ResetShort $session.ResetsAt
+            if ($rs) { $script:SessionResetTxt.Text = " ($rs)" } else { $script:SessionResetTxt.Text = '' }
         } else {
             $script:SessionTxt.Text = "$($script:L.PillSession) ?"
+            $script:SessionResetTxt.Text = ''
         }
         if ($weekly) {
             $script:WeeklyTxt.Text = "$($script:L.PillWeek) $(Format-Pct ([math]::Round($weekly.Percent)))"
@@ -166,6 +171,7 @@ function Update-All([switch]$Force) {
         if (-not $script:HasData) {
             $script:SessionTxt.Text = $script:L.ErrorLbl
             $script:SessionTxt.Foreground = Get-Brush $script:Colors.FillCritical
+            $script:SessionResetTxt.Text = ''
             $script:WeeklyTxt.Text = '—'
             $script:PillBorder.ToolTip = $msg
         }
@@ -265,7 +271,7 @@ $zTimer.Add_Tick({ Assert-Topmost; Set-PillPosition })
 if ($SelfTest) {
     Write-Host 'SelfTest: veri cekiliyor...'
     Update-All
-    Write-Host "SelfTest: rozet = '$($script:SessionTxt.Text) · $($script:WeeklyTxt.Text)'"
+    Write-Host "SelfTest: rozet = '$($script:SessionTxt.Text)$($script:SessionResetTxt.Text) · $($script:WeeklyTxt.Text)'"
     Write-Host "SelfTest: panel satir sayisi = $($script:RowsPanel.Children.Count), durum = $($script:StatusText.Text)"
     Write-Host 'SelfTest: OK'
     exit 0

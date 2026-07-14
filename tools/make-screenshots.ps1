@@ -130,6 +130,7 @@ function New-PillVisual {
     $star.Margin = New-Object System.Windows.Thickness(0, 0, 7, 0)
     [void]$sp.Children.Add($star)
     [void]$sp.Children.Add((New-Text "$($script:L.PillSession) $(Format-Pct 37)" 12 $script:Colors.FillNormal 'Normal'))
+    [void]$sp.Children.Add((New-Text " ($(Format-ResetShort ((Get-Date).AddMinutes(84).ToString('o'))))" 12 '#8A8F98' 'Normal'))
     [void]$sp.Children.Add((New-Text " $([char]0xB7) " 12 '#6B7078' 'Normal'))
     [void]$sp.Children.Add((New-Text "$($script:L.PillWeek) $(Format-Pct 8)" 12 $script:Colors.FillNormal 'Normal'))
     $pill.Child = $sp
