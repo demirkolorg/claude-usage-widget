@@ -29,14 +29,14 @@ $pillXaml = @'
         Title="Claude Usage Pill" SizeToContent="WidthAndHeight"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         Topmost="True" ShowInTaskbar="False" ResizeMode="NoResize" ShowActivated="False">
-  <Border x:Name="Pill" CornerRadius="8" Background="#F01B1D22"
-          BorderBrush="#2EFFFFFF" BorderThickness="1" Padding="10,5,10,6" Cursor="Hand">
+  <Border x:Name="Pill" CornerRadius="10" Background="#F01B1D22"
+          BorderBrush="#2EFFFFFF" BorderThickness="1" Padding="14,7,14,8" Cursor="Hand">
     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-      <TextBlock Text="&#x2733;" Foreground="#DA7756" FontSize="12" Margin="0,0,7,0" VerticalAlignment="Center"/>
-      <TextBlock x:Name="SessionTxt" Text="&#8230;" FontSize="12" Foreground="#F2F3F5" VerticalAlignment="Center"/>
-      <TextBlock x:Name="SessionResetTxt" FontSize="12" Foreground="#8A8F98" VerticalAlignment="Center"/>
-      <TextBlock Text=" &#183; " FontSize="12" Foreground="#6B7078" VerticalAlignment="Center"/>
-      <TextBlock x:Name="WeeklyTxt" Text="&#8230;" FontSize="12" Foreground="#F2F3F5" VerticalAlignment="Center"/>
+      <TextBlock Text="&#x2733;" Foreground="#DA7756" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+      <TextBlock x:Name="SessionTxt" Text="&#8230;" FontSize="14" Foreground="#F2F3F5" VerticalAlignment="Center"/>
+      <TextBlock x:Name="SessionResetTxt" FontSize="14" Foreground="#8A8F98" VerticalAlignment="Center"/>
+      <TextBlock Text=" &#183; " FontSize="14" Foreground="#6B7078" VerticalAlignment="Center"/>
+      <TextBlock x:Name="WeeklyTxt" Text="&#8230;" FontSize="14" Foreground="#F2F3F5" VerticalAlignment="Center"/>
     </StackPanel>
   </Border>
 </Window>

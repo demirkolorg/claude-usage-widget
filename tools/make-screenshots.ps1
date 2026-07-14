@@ -117,22 +117,22 @@ function New-WidgetVisual {
 
 function New-PillVisual {
     $pill = New-Object System.Windows.Controls.Border
-    $pill.CornerRadius = New-Object System.Windows.CornerRadius(8)
+    $pill.CornerRadius = New-Object System.Windows.CornerRadius(10)
     $pill.Background = Get-Brush '#F01B1D22'
     $pill.BorderBrush = Get-Brush '#2EFFFFFF'
     $pill.BorderThickness = New-Object System.Windows.Thickness(1)
-    $pill.Padding = New-Object System.Windows.Thickness(10, 5, 10, 6)
+    $pill.Padding = New-Object System.Windows.Thickness(14, 7, 14, 8)
     $pill.HorizontalAlignment = [System.Windows.HorizontalAlignment]::Left
 
     $sp = New-Object System.Windows.Controls.StackPanel
     $sp.Orientation = [System.Windows.Controls.Orientation]::Horizontal
-    $star = New-Text ([char]0x2733) 12 $script:Colors.Accent 'Normal'
-    $star.Margin = New-Object System.Windows.Thickness(0, 0, 7, 0)
+    $star = New-Text ([char]0x2733) 14 $script:Colors.Accent 'Normal'
+    $star.Margin = New-Object System.Windows.Thickness(0, 0, 8, 0)
     [void]$sp.Children.Add($star)
-    [void]$sp.Children.Add((New-Text "$($script:L.PillSession) $(Format-Pct 37)" 12 $script:Colors.FillNormal 'Normal'))
-    [void]$sp.Children.Add((New-Text " ($(Format-ResetShort ((Get-Date).AddMinutes(84).ToString('o'))))" 12 '#8A8F98' 'Normal'))
-    [void]$sp.Children.Add((New-Text " $([char]0xB7) " 12 '#6B7078' 'Normal'))
-    [void]$sp.Children.Add((New-Text "$($script:L.PillWeek) $(Format-Pct 8)" 12 $script:Colors.FillNormal 'Normal'))
+    [void]$sp.Children.Add((New-Text "$($script:L.PillSession) $(Format-Pct 37)" 14 $script:Colors.FillNormal 'Normal'))
+    [void]$sp.Children.Add((New-Text " ($(Format-ResetShort ((Get-Date).AddMinutes(84).ToString('o'))))" 14 '#8A8F98' 'Normal'))
+    [void]$sp.Children.Add((New-Text " $([char]0xB7) " 14 '#6B7078' 'Normal'))
+    [void]$sp.Children.Add((New-Text "$($script:L.PillWeek) $(Format-Pct 8)" 14 $script:Colors.FillNormal 'Normal'))
     $pill.Child = $sp
     return $pill
 }
