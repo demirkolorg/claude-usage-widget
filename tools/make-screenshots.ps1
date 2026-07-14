@@ -127,12 +127,37 @@ function New-PillVisual {
     $sp = New-Object System.Windows.Controls.StackPanel
     $sp.Orientation = [System.Windows.Controls.Orientation]::Horizontal
     $star = New-Text ([char]0x2733) 14 $script:Colors.Accent 'Normal'
-    $star.Margin = New-Object System.Windows.Thickness(0, 0, 8, 0)
+    $star.Margin = New-Object System.Windows.Thickness(0, 0, 10, 0)
     [void]$sp.Children.Add($star)
-    [void]$sp.Children.Add((New-Text "$($script:L.PillSession) $(Format-Pct 37)" 14 $script:Colors.FillNormal 'Normal'))
-    [void]$sp.Children.Add((New-Text " ($(Format-ResetShort ((Get-Date).AddMinutes(84).ToString('o'))))" 14 '#8A8F98' 'Normal'))
-    [void]$sp.Children.Add((New-Text " $([char]0xB7) " 14 '#6B7078' 'Normal'))
-    [void]$sp.Children.Add((New-Text "$($script:L.PillWeek) $(Format-Pct 8)" 14 $script:Colors.FillNormal 'Normal'))
+
+    $sLbl = New-Text $script:L.PillSession 12.5 '#9AA0AA' 'Normal'
+    $sLbl.Margin = New-Object System.Windows.Thickness(0, 0, 6, 0)
+    [void]$sp.Children.Add($sLbl)
+    [void]$sp.Children.Add((New-Text (Format-Pct 37) 14 $script:Colors.FillNormal 'SemiBold'))
+
+    $clock = New-Text ([char]0xE823) 11.5 '#8A8F98' 'Normal'
+    $clock.FontFamily = New-Object System.Windows.Media.FontFamily('Segoe MDL2 Assets')
+    $clock.Margin = New-Object System.Windows.Thickness(10, 1, 5, 0)
+    $clock.VerticalAlignment = [System.Windows.VerticalAlignment]::Center
+    [void]$sp.Children.Add($clock)
+    [void]$sp.Children.Add((New-Text (Format-ResetShort ((Get-Date).AddMinutes(84).ToString('o'))) 12.5 '#B9BEC7' 'Normal'))
+
+    $div = New-Object System.Windows.Controls.Border
+    $div.Width = 1
+    $div.Height = 15
+    $div.Background = Get-Brush '#30FFFFFF'
+    $div.Margin = New-Object System.Windows.Thickness(12, 1, 12, 0)
+    $div.VerticalAlignment = [System.Windows.VerticalAlignment]::Center
+    [void]$sp.Children.Add($div)
+
+    $wLbl = New-Text $script:L.PillWeek 12.5 '#9AA0AA' 'Normal'
+    $wLbl.Margin = New-Object System.Windows.Thickness(0, 0, 6, 0)
+    [void]$sp.Children.Add($wLbl)
+    [void]$sp.Children.Add((New-Text (Format-Pct 8) 14 $script:Colors.FillNormal 'SemiBold'))
+
+    foreach ($child in $sp.Children) {
+        if ($child -is [System.Windows.Controls.TextBlock]) { $child.VerticalAlignment = [System.Windows.VerticalAlignment]::Center }
+    }
     $pill.Child = $sp
     return $pill
 }
@@ -187,7 +212,7 @@ foreach ($lang in @('en', 'tr')) {
     Set-UsageLanguage $lang
     Save-Png (New-Backdrop (New-PanelVisual)) (Join-Path $assets "panel-$lang.png") (440 + 56)
     Save-Png (New-Backdrop (New-WidgetVisual) 24) (Join-Path $assets "widget-$lang.png") (330 + 48)
-    Save-Png (New-Backdrop (New-PillVisual) 16) (Join-Path $assets "pill-$lang.png") 240
+    Save-Png (New-Backdrop (New-PillVisual) 16) (Join-Path $assets "pill-$lang.png") 430
     Save-Png (New-Backdrop (New-PromoVisual $lang) 44) (Join-Path $assets "promo-$lang.png") 980
 }
 Write-Host 'All screenshots generated.'
