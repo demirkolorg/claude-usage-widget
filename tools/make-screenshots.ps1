@@ -38,10 +38,12 @@ function New-Backdrop($child, [double]$pad = 28) {
 function New-SampleRows {
     $nextFriday = (Get-Date).Date.AddHours(11)
     while ($nextFriday.DayOfWeek -ne [DayOfWeek]::Friday -or $nextFriday -lt (Get-Date)) { $nextFriday = $nextFriday.AddDays(1) }
+    # Ornek gorselde her zaman gun adi bicimi gorunsun (bugun/yarin degil)
+    if ($nextFriday -lt (Get-Date).AddDays(2)) { $nextFriday = $nextFriday.AddDays(7) }
     @(
-        [pscustomobject]@{ Title = $script:L.SessionTitle; Percent = 37; ResetsAt = (Get-Date).AddMinutes(84).ToString('o'); Group = 'session'; Kind = 'session'; Severity = 'normal' }
-        [pscustomobject]@{ Title = $script:L.WeeklyAll; Percent = 8; ResetsAt = $nextFriday.ToString('o'); Group = 'weekly'; Kind = 'weekly_all'; Severity = 'normal' }
-        [pscustomobject]@{ Title = ($script:L.WeeklyModel -f 'Fable'); Percent = 8; ResetsAt = $nextFriday.ToString('o'); Group = 'weekly'; Kind = 'weekly_scoped'; Severity = 'normal' }
+        [pscustomobject]@{ Title = $script:Loc.SessionTitle; Percent = 37; ResetsAt = (Get-Date).AddMinutes(84).ToString('o'); Group = 'session'; Kind = 'session'; Severity = 'normal' }
+        [pscustomobject]@{ Title = $script:Loc.WeeklyAll; Percent = 8; ResetsAt = $nextFriday.ToString('o'); Group = 'weekly'; Kind = 'weekly_all'; Severity = 'normal' }
+        [pscustomobject]@{ Title = ($script:Loc.WeeklyModel -f 'Fable'); Percent = 8; ResetsAt = $nextFriday.ToString('o'); Group = 'weekly'; Kind = 'weekly_scoped'; Severity = 'normal' }
     )
 }
 
@@ -88,11 +90,11 @@ function New-PanelVisual {
     $head = New-HeaderGrid 17 11
     $head.Margin = New-Object System.Windows.Thickness(0, 0, 0, 4)
     [void]$sp.Children.Add($head)
-    $sub = New-Text $script:L.UsageLimits 11.5 $script:Colors.TextSecondary 'Normal'
+    $sub = New-Text $script:Loc.UsageLimits 11.5 $script:Colors.TextSecondary 'Normal'
     $sub.Margin = New-Object System.Windows.Thickness(0, 0, 0, 14)
     [void]$sp.Children.Add($sub)
     foreach ($r in (New-SampleRows)) { [void]$sp.Children.Add((New-UsageRowElement $r -Large)) }
-    [void]$sp.Children.Add((New-Text "$($script:L.Updated): 09:41:07" 11 '#6B7078' 'Normal'))
+    [void]$sp.Children.Add((New-Text "$($script:Loc.Updated): 09:41:07" 11 '#6B7078' 'Normal'))
     $card.Child = $sp
     return $card
 }
@@ -110,7 +112,7 @@ function New-WidgetVisual {
     $head.Margin = New-Object System.Windows.Thickness(0, 0, 0, 12)
     [void]$sp.Children.Add($head)
     foreach ($r in (New-SampleRows)) { [void]$sp.Children.Add((New-UsageRowElement $r)) }
-    [void]$sp.Children.Add((New-Text "$($script:L.Updated): 09:41:07" 10 '#6B7078' 'Normal'))
+    [void]$sp.Children.Add((New-Text "$($script:Loc.Updated): 09:41:07" 10 '#6B7078' 'Normal'))
     $card.Child = $sp
     return $card
 }
@@ -130,7 +132,7 @@ function New-PillVisual {
     $star.Margin = New-Object System.Windows.Thickness(0, 0, 10, 0)
     [void]$sp.Children.Add($star)
 
-    $sLbl = New-Text $script:L.PillSession 12.5 '#9AA0AA' 'Normal'
+    $sLbl = New-Text $script:Loc.PillSession 12.5 '#9AA0AA' 'Normal'
     $sLbl.Margin = New-Object System.Windows.Thickness(0, 0, 6, 0)
     [void]$sp.Children.Add($sLbl)
     [void]$sp.Children.Add((New-Text (Format-Pct 37) 14 $script:Colors.FillNormal 'SemiBold'))
@@ -150,7 +152,7 @@ function New-PillVisual {
     $div.VerticalAlignment = [System.Windows.VerticalAlignment]::Center
     [void]$sp.Children.Add($div)
 
-    $wLbl = New-Text $script:L.PillWeek 12.5 '#9AA0AA' 'Normal'
+    $wLbl = New-Text $script:Loc.PillWeek 12.5 '#9AA0AA' 'Normal'
     $wLbl.Margin = New-Object System.Windows.Thickness(0, 0, 6, 0)
     [void]$sp.Children.Add($wLbl)
     [void]$sp.Children.Add((New-Text (Format-Pct 8) 14 $script:Colors.FillNormal 'SemiBold'))

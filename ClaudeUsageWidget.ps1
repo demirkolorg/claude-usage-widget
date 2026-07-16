@@ -78,8 +78,8 @@ $script:PlanText   = $script:Window.FindName('PlanText')
 $btnRefresh        = $script:Window.FindName('BtnRefresh')
 $btnClose          = $script:Window.FindName('BtnClose')
 
-$btnRefresh.ToolTip = $script:L.Refresh
-$btnClose.ToolTip = $script:L.Quit
+$btnRefresh.ToolTip = $script:Loc.Refresh
+$btnClose.ToolTip = $script:Loc.Quit
 
 $script:BackoffUntil = [DateTime]::MinValue
 
@@ -91,22 +91,22 @@ function Update-Usage([switch]$Force) {
         $rows = @(Get-LimitRows $data)
         $script:RowsPanel.Children.Clear()
         if ($rows.Count -eq 0) {
-            $script:StatusText.Text = $script:L.NoData
+            $script:StatusText.Text = $script:Loc.NoData
             return
         }
         foreach ($r in $rows) { [void]$script:RowsPanel.Children.Add((New-UsageRowElement $r)) }
-        $script:StatusText.Text = "$($script:L.Updated): $((Get-Date).ToString('HH:mm:ss'))"
+        $script:StatusText.Text = "$($script:Loc.Updated): $((Get-Date).ToString('HH:mm:ss'))"
         $script:StatusText.Foreground = Get-Brush '#6B7078'
     } catch {
         $msg = $_.Exception.Message
         if ($msg -match '429') {
-            $msg = $script:L.Err429
+            $msg = $script:Loc.Err429
             # Elimizde hic veri yoksa kisa araliklarla dene, veri varsa uzun bekle
             $mins = 5
             if ($script:RowsPanel.Children.Count -eq 0) { $mins = 1 }
             $script:BackoffUntil = [DateTime]::Now.AddMinutes($mins)
         }
-        $script:StatusText.Text = "$($script:L.ErrorLbl): $msg"
+        $script:StatusText.Text = "$($script:Loc.ErrorLbl): $msg"
         $script:StatusText.Foreground = Get-Brush $script:Colors.FillCritical
     }
 }
@@ -119,10 +119,10 @@ $script:Window.Add_MouseLeftButtonDown({ try { $script:Window.DragMove() } catch
 # Sag tik menusu
 $menu = New-Object System.Windows.Controls.ContextMenu
 $miRefresh = New-Object System.Windows.Controls.MenuItem
-$miRefresh.Header = $script:L.Refresh
+$miRefresh.Header = $script:Loc.Refresh
 $miRefresh.Add_Click({ Update-Usage -Force })
 $miTopmost = New-Object System.Windows.Controls.MenuItem
-$miTopmost.Header = $script:L.AlwaysOnTop
+$miTopmost.Header = $script:Loc.AlwaysOnTop
 $miTopmost.IsCheckable = $true
 $miTopmost.IsChecked = [bool]$script:Config.topmost
 $miTopmost.Add_Click({
@@ -130,7 +130,7 @@ $miTopmost.Add_Click({
     $script:Config.topmost = [bool]$miTopmost.IsChecked
 })
 $miClose = New-Object System.Windows.Controls.MenuItem
-$miClose.Header = $script:L.Quit
+$miClose.Header = $script:Loc.Quit
 $miClose.Add_Click({ $script:Window.Close() })
 [void]$menu.Items.Add($miRefresh)
 [void]$menu.Items.Add($miTopmost)

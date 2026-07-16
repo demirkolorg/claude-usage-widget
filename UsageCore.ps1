@@ -42,6 +42,8 @@ $script:Strings = @{
         ResetShortH    = "{0} sa {1} dk"
         ResetShortM    = "{0} dk"
         ResetWeekly    = "Sıfırlanma: {0} {1}"
+        ResetWeeklyToday    = "Sıfırlanma: bugün {0}"
+        ResetWeeklyTomorrow = "Sıfırlanma: yarın {0}"
         Updated        = "Güncellendi"
         ErrorLbl       = 'Hata'
         UsageLimits    = "Kullanım limitleri"
@@ -72,6 +74,8 @@ $script:Strings = @{
         ResetShortH    = '{0}h {1}m'
         ResetShortM    = '{0}m'
         ResetWeekly    = 'Resets {0} {1}'
+        ResetWeeklyToday    = 'Resets today {0}'
+        ResetWeeklyTomorrow = 'Resets tomorrow {0}'
         Updated        = 'Updated'
         ErrorLbl       = 'Error'
         UsageLimits    = 'Usage limits'
@@ -98,11 +102,11 @@ function Resolve-UsageLanguage([string]$pref) {
 
 function Set-UsageLanguage([string]$lang) {
     $script:Lang = Resolve-UsageLanguage $lang
-    $script:L = $script:Strings[$script:Lang]
+    $script:Loc = $script:Strings[$script:Lang]
 }
 Set-UsageLanguage "$($script:AppConfig.language)"
 
-function Format-Pct([int]$n) { $script:L.PctFmt -f $n }
+function Format-Pct([int]$n) { $script:Loc.PctFmt -f $n }
 
 # ---- Colors ----
 $script:Colors = @{
@@ -120,11 +124,11 @@ function Get-Brush([string]$hex) { $script:BrushConv.ConvertFromString($hex) }
 # ---- Data layer ----
 function Get-AccessToken {
     if (-not (Test-Path $script:CredPath)) {
-        throw ($script:L.ErrNoCred -f $script:CredPath)
+        throw ($script:Loc.ErrNoCred -f $script:CredPath)
     }
     $creds = Get-Content $script:CredPath -Raw | ConvertFrom-Json
     if (-not $creds.claudeAiOauth -or -not $creds.claudeAiOauth.accessToken) {
-        throw $script:L.ErrNoToken
+        throw $script:Loc.ErrNoToken
     }
     return $creds.claudeAiOauth
 }
@@ -151,7 +155,7 @@ function Get-UsageData {
     } catch {
         $status = 0
         if ($_.Exception.Response) { $status = [int]$_.Exception.Response.StatusCode }
-        if ($status -eq 401) { throw $script:L.Err401 }
+        if ($status -eq 401) { throw $script:Loc.Err401 }
         throw
     }
 }
@@ -165,12 +169,12 @@ function Get-LimitRows($data) {
     if ($limits.Count -gt 0) {
         foreach ($l in $limits) {
             $title = switch ($l.kind) {
-                'session'       { $script:L.SessionTitle }
-                'weekly_all'    { $script:L.WeeklyAll }
+                'session'       { $script:Loc.SessionTitle }
+                'weekly_all'    { $script:Loc.WeeklyAll }
                 'weekly_scoped' {
                     $model = ''
                     if ($l.scope -and $l.scope.model) { $model = "$($l.scope.model.display_name)" }
-                    if ($model) { $script:L.WeeklyModel -f $model } else { $script:L.WeeklyGeneric }
+                    if ($model) { $script:Loc.WeeklyModel -f $model } else { $script:Loc.WeeklyGeneric }
                 }
                 default         { "$($l.kind)" }
             }
@@ -186,13 +190,13 @@ function Get-LimitRows($data) {
     } else {
         if ($data.five_hour) {
             $rows += [pscustomobject]@{
-                Title = $script:L.SessionTitle; Percent = [math]::Round([double]$data.five_hour.utilization)
+                Title = $script:Loc.SessionTitle; Percent = [math]::Round([double]$data.five_hour.utilization)
                 ResetsAt = $data.five_hour.resets_at; Group = 'session'; Kind = 'session'; Severity = 'normal'
             }
         }
         if ($data.seven_day) {
             $rows += [pscustomobject]@{
-                Title = $script:L.WeeklyAll; Percent = [math]::Round([double]$data.seven_day.utilization)
+                Title = $script:Loc.WeeklyAll; Percent = [math]::Round([double]$data.seven_day.utilization)
                 ResetsAt = $data.seven_day.resets_at; Group = 'weekly'; Kind = 'weekly_all'; Severity = 'normal'
             }
         }
@@ -210,12 +214,16 @@ function Format-ResetText([string]$resetsAt, [string]$group) {
         $ts = $local - [DateTimeOffset]::Now
         if ($ts.TotalSeconds -lt 0) { $ts = [TimeSpan]::Zero }
         $h = [math]::Floor($ts.TotalHours)
-        if ($h -ge 1) { return $script:L.ResetSessionH -f $h, $ts.Minutes }
-        return $script:L.ResetSessionM -f $ts.Minutes
+        if ($h -ge 1) { return $script:Loc.ResetSessionH -f $h, $ts.Minutes }
+        return $script:Loc.ResetSessionM -f $ts.Minutes
     }
 
-    $day = $script:L.Days["$($local.DayOfWeek)"]
-    return $script:L.ResetWeekly -f $day, $local.ToString('HH:mm')
+    # Bugun/yarin ise gun adi yerine acikca soyle — "Cum 11:00" karisikligini onler
+    $daysAway = ($local.Date - (Get-Date).Date).Days
+    if ($daysAway -le 0) { return $script:Loc.ResetWeeklyToday -f $local.ToString('HH:mm') }
+    if ($daysAway -eq 1) { return $script:Loc.ResetWeeklyTomorrow -f $local.ToString('HH:mm') }
+    $day = $script:Loc.Days["$($local.DayOfWeek)"]
+    return $script:Loc.ResetWeekly -f $day, $local.ToString('HH:mm')
 }
 
 # Rozet gibi dar alanlar icin kompakt geri sayim: "1 sa 12 dk" / "1h 12m"
@@ -227,8 +235,8 @@ function Format-ResetShort([string]$resetsAt) {
     $ts = $local - [DateTimeOffset]::Now
     if ($ts.TotalSeconds -lt 0) { $ts = [TimeSpan]::Zero }
     $h = [math]::Floor($ts.TotalHours)
-    if ($h -ge 1) { return $script:L.ResetShortH -f $h, $ts.Minutes }
-    return $script:L.ResetShortM -f $ts.Minutes
+    if ($h -ge 1) { return $script:Loc.ResetShortH -f $h, $ts.Minutes }
+    return $script:Loc.ResetShortM -f $ts.Minutes
 }
 
 function Get-FillColor([double]$percent, [string]$severity) {
@@ -271,14 +279,14 @@ function New-UsageRowElement($row, [switch]$Large) {
         $pctStack.HorizontalAlignment = [System.Windows.HorizontalAlignment]::Right
         $pctTb = New-Text (Format-Pct $pct) 22 $fillColor 'SemiBold'
         $pctTb.HorizontalAlignment = [System.Windows.HorizontalAlignment]::Right
-        $capTb = New-Text $script:L.UsedWord 10 $script:Colors.TextSecondary 'Normal'
+        $capTb = New-Text $script:Loc.UsedWord 10 $script:Colors.TextSecondary 'Normal'
         $capTb.HorizontalAlignment = [System.Windows.HorizontalAlignment]::Right
         $capTb.Margin = New-Object System.Windows.Thickness(0, -2, 0, 0)
         [void]$pctStack.Children.Add($pctTb)
         [void]$pctStack.Children.Add($capTb)
         $usedEl = $pctStack
     } else {
-        $usedEl = New-Text ($script:L.UsedFmt -f $pct) 12 $script:Colors.TextSecondary 'Normal'
+        $usedEl = New-Text ($script:Loc.UsedFmt -f $pct) 12 $script:Colors.TextSecondary 'Normal'
         $usedEl.HorizontalAlignment = [System.Windows.HorizontalAlignment]::Right
     }
     [void]$head.Children.Add($titleTb)
@@ -309,7 +317,7 @@ function New-UsageRowElement($row, [switch]$Large) {
 
     $foot = New-Object System.Windows.Controls.Grid
     $resetTb = New-Text (Format-ResetText $row.ResetsAt $row.Group) $footSize $script:Colors.TextSecondary 'Normal'
-    $leftTb = New-Text ($script:L.LeftFmt -f [math]::Round(100 - $pct)) $footSize $script:Colors.TextSecondary 'Normal'
+    $leftTb = New-Text ($script:Loc.LeftFmt -f [math]::Round(100 - $pct)) $footSize $script:Colors.TextSecondary 'Normal'
     $leftTb.HorizontalAlignment = [System.Windows.HorizontalAlignment]::Right
     [void]$foot.Children.Add($resetTb)
     [void]$foot.Children.Add($leftTb)

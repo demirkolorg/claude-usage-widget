@@ -89,8 +89,8 @@ $script:WeekLbl    = $script:PillWin.FindName('WeekLbl')
 $script:WeekPct    = $script:PillWin.FindName('WeekPct')
 $script:PillBorder = $script:PillWin.FindName('Pill')
 
-$script:SessionLbl.Text = $script:L.PillSession
-$script:WeekLbl.Text = $script:L.PillWeek
+$script:SessionLbl.Text = $script:Loc.PillSession
+$script:WeekLbl.Text = $script:Loc.PillWeek
 $script:RowsPanel  = $script:Panel.FindName('Rows')
 $script:StatusText = $script:Panel.FindName('StatusText')
 $script:PlanBadge  = $script:Panel.FindName('PlanBadge')
@@ -98,9 +98,9 @@ $script:PlanText   = $script:Panel.FindName('PlanText')
 $btnRefresh        = $script:Panel.FindName('BtnRefresh')
 $btnHide           = $script:Panel.FindName('BtnHide')
 
-$script:Panel.FindName('SubtitleText').Text = $script:L.UsageLimits
-$btnRefresh.ToolTip = $script:L.Refresh
-$btnHide.ToolTip = $script:L.HidePanel
+$script:Panel.FindName('SubtitleText').Text = $script:Loc.UsageLimits
+$btnRefresh.ToolTip = $script:Loc.Refresh
+$btnHide.ToolTip = $script:Loc.HidePanel
 
 $script:Exiting = $false
 $script:PanelLastHidden = [DateTime]::MinValue
@@ -173,13 +173,13 @@ function Update-All([switch]$Force) {
         # Panel satirlari
         $script:RowsPanel.Children.Clear()
         foreach ($r in $rows) { [void]$script:RowsPanel.Children.Add((New-UsageRowElement $r -Large)) }
-        $script:StatusText.Text = "$($script:L.Updated): $((Get-Date).ToString('HH:mm:ss'))"
+        $script:StatusText.Text = "$($script:Loc.Updated): $((Get-Date).ToString('HH:mm:ss'))"
         $script:StatusText.Foreground = Get-Brush '#6B7078'
         $script:HasData = $true
     } catch {
         $msg = $_.Exception.Message
         if ($msg -match '429') {
-            $msg = $script:L.Err429
+            $msg = $script:Loc.Err429
             # Elimizde hic veri yoksa kisa araliklarla dene, veri varsa uzun bekle
             $mins = 5
             if (-not $script:HasData) { $mins = 1 }
@@ -195,7 +195,7 @@ function Update-All([switch]$Force) {
             $script:WeekPct.Foreground = Get-Brush $script:Colors.FillCritical
             $script:PillBorder.ToolTip = $msg
         }
-        $script:StatusText.Text = "$($script:L.ErrorLbl): $msg"
+        $script:StatusText.Text = "$($script:Loc.ErrorLbl): $msg"
         $script:StatusText.Foreground = Get-Brush $script:Colors.FillCritical
     }
 }
@@ -246,10 +246,10 @@ function Exit-App {
 # Rozet sag tik menusu
 $menu = New-Object System.Windows.Controls.ContextMenu
 $miRefresh = New-Object System.Windows.Controls.MenuItem
-$miRefresh.Header = $script:L.Refresh
+$miRefresh.Header = $script:Loc.Refresh
 $miRefresh.Add_Click({ Update-All -Force })
 $miExit = New-Object System.Windows.Controls.MenuItem
-$miExit.Header = $script:L.Quit
+$miExit.Header = $script:Loc.Quit
 $miExit.Add_Click({ Exit-App })
 [void]$menu.Items.Add($miRefresh)
 [void]$menu.Items.Add((New-Object System.Windows.Controls.Separator))
