@@ -125,3 +125,11 @@ or remotely:
 ## License
 
 [MIT](LICENSE)
+
+## Security and maintenance notes
+
+- **Review remote scripts before running them.** For a more inspectable installation, clone the repository and read `install.ps1` before executing it rather than piping a remote download into PowerShell.
+- The widget reads an existing local Claude Code credential and contacts the usage endpoint. **Never upload `~/.claude/.credentials.json` or paste its contents into an issue.**
+- The usage endpoint is tied to Claude's current authentication behavior and may change. This repository is a community utility, not an official Anthropic product.
+- When reporting a bug, share Windows/PowerShell versions and redacted error messages, not tokens, account data or credential files.
+- **Validation:** `powershell -STA -File ClaudeUsageTaskbar.ps1 -SelfTest` provides a local self-check; no GitHub CI result is asserted here.
